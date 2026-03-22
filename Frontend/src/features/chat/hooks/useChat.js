@@ -1,96 +1,106 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { initializeSocket } from "../service/chat.socket";
+import {
+  fetchChats,
+  fetchMessages,
+  sendMessage,
+  deleteChat,
+  setSidebarOpen,
+  setShowSearch,
+  setSearchQuery,
+  setActiveChat,
+  resetCurrentChat,
+} from "../state/chat.slice";
 
 const useChat = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [messages, setMessages] = useState([]);
+  const dispatch = useDispatch();
+  const {
+    sidebarOpen,
+    showSearch,
+    searchQuery,
+    messages,
+    chats,
+    filteredChats,
+    activeChatId,
+    activeChat,
+    loading,
+    sending,
+    error,
+    loadingChats,
+    loadingMessages,
+  } = useSelector((state) => state.chat);
+
   const [messageInput, setMessageInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState(null);
-  const [filteredChats, setFilteredChats] = useState([]);
-  const [chats, setChats] = useState([]);
-  const [activeChatId, setActiveChatId] = useState(null);
-  const [activeChat, setActiveChat] = useState(null);
-  const [loadingChats, setLoadingChats] = useState(false);
-  const [loadingMessages, setLoadingMessages] = useState(false);
+
+  useEffect(() => {
+    initializeSocket();
+    dispatch(fetchChats());
+  }, [dispatch]);
 
   const handleSearchToggle = useCallback(() => {
-    setShowSearch((prev) => !prev);
-    if (showSearch) {
-      setSearchQuery("");
-      setFilteredChats(chats);
+    const nextValue = !showSearch;
+    dispatch(setShowSearch(nextValue));
+    if (!nextValue) {
+      dispatch(setSearchQuery(""));
     }
-  }, [showSearch, chats]);
+  }, [dispatch, showSearch]);
 
-  const handleChatSelect = useCallback((chatId) => {
-    setActiveChatId(chatId);
-    const selected = chats.find((chat) => chat.id === chatId);
-    setActiveChat(selected);
-    setMessages(selected?.messages || []);
-  }, [chats]);
+  const handleChatSelect = useCallback(
+    async (chatId) => {
+      dispatch(setActiveChat(chatId));
+      await dispatch(fetchMessages(chatId)).unwrap();
+    },
+    [dispatch]
+  );
 
-  const handleDeleteChat = useCallback((chatId) => {
-    setChats((prev) => prev.filter((chat) => chat.id !== chatId));
-    setFilteredChats((prev) => prev.filter((chat) => chat.id !== chatId));
-    if (activeChatId === chatId) {
-      setActiveChatId(null);
-      setActiveChat(null);
-      setMessages([]);
-    }
-  }, [activeChatId]);
+  const handleDeleteChat = useCallback(
+    async (chatId) => {
+      await dispatch(deleteChat(chatId)).unwrap();
+      await dispatch(fetchChats());
+    },
+    [dispatch]
+  );
 
   const handleNewChat = useCallback(() => {
-    setActiveChatId(null);
-    setActiveChat(null);
-    setMessages([]);
+    dispatch(resetCurrentChat());
     setMessageInput("");
-  }, []);
+  }, [dispatch]);
 
   const handleSend = useCallback(
     async (e) => {
       e.preventDefault();
-      if (!messageInput.trim()) return;
+      const message = messageInput.trim();
+      if (!message || sending) return;
 
-      setSending(true);
+      setMessageInput("");
       try {
-        const userMessage = {
-          id: Date.now(),
-          role: "user",
-          content: messageInput,
-        };
-        setMessages((prev) => [...prev, userMessage]);
-        setMessageInput("");
+        await dispatch(
+          sendMessage({
+            message,
+            chatId: activeChatId,
+          })
+        ).unwrap();
 
-        // Mock AI response - replace with actual API call
-        setTimeout(() => {
-          const aiMessage = {
-            id: Date.now() + 1,
-            role: "ai",
-            content: "This is a mock response. Connect to your AI service.",
-          };
-          setMessages((prev) => [...prev, aiMessage]);
-          setSending(false);
-        }, 500);
-      } catch (err) {
-        setError(err.message);
-        setSending(false);
+        if (!activeChatId) {
+          await dispatch(fetchChats()).unwrap();
+        }
+      } catch {
+        // Errors are already managed by the chat slice.
       }
     },
-    [messageInput]
+    [dispatch, messageInput, activeChatId, sending]
   );
 
   return {
     sidebarOpen,
-    setSidebarOpen,
+    setSidebarOpen: (value) => dispatch(setSidebarOpen(value)),
     showSearch,
     handleSearchToggle,
     searchQuery,
-    setSearchQuery,
+    setSearchQuery: (value) => dispatch(setSearchQuery(value)),
     messages,
-    setMessages,
+    setMessages: () => {},
     messageInput,
     setMessageInput,
     loading,

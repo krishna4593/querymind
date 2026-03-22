@@ -121,14 +121,17 @@ const Dashboard = () => {
                         type="button"
                         onClick={() => chat.handleChatSelect(chatItem.id)}
                         className="min-w-0 flex-1 truncate text-left"
-                        title={chatItem.title}
+                        title={chatItem.title || "Untitled Chat"}
                       >
-                        {chatItem.title}
+                        {chatItem.title || "Untitled Chat"}
                       </button>
 
                       <button
                         type="button"
-                        onClick={() => chat.handleDeleteChat(chatItem.id)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          chat.handleDeleteChat(chatItem.id);
+                        }}
                         className="rounded-md p-1 text-zinc-400 transition hover:bg-red-500/20 hover:text-red-300"
                         aria-label="Delete chat"
                         title="Delete chat"
