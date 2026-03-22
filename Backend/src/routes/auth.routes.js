@@ -10,14 +10,18 @@ router.post("/register", registerValidator, registerController);
 //verifyEmail route "/api/auth/verify-email"
 router.get("/verify-email", verifyEmail);
 
+//login route "/api/auth/login" - GET redirect to frontend
+router.get("/login", (req, res) => {
+  res.redirect("http://localhost:5173/login");
+});
 
-//login route "/api/auth/login"
+//login route "/api/auth/login" - POST for API
 router.post("/login", loginValidator, loginController);
-export default router;
-
 
 //get-me route "/api/auth/me"
 router.get("/me", authUser, getMe);  
 
 //resend verification email route "/api/auth/resend-email"
-router.post("/resend-email", resendVerificationEmail)
+router.post("/resend-email", resendVerificationEmail);
+
+export default router;

@@ -1,6 +1,6 @@
 import {useDispatch} from 'react-redux'
 import {setUser, setLoading, setError} from '../auth.slice'
-import {register, login , getMe} from '../service/auth.api.js'
+import {register, login , getMe, resendVerification} from '../service/auth.api.js'
 
  export const useAuth = () => {
     const dispatch = useDispatch()
@@ -8,12 +8,16 @@ import {register, login , getMe} from '../service/auth.api.js'
         dispatch(setLoading(true))
         try {
             const response = await register({email , password , username})
-            console.log(response)
-            
-            
+            return {
+                success: true,
+                data: response
+            }
         } catch (error) {
             dispatch(setError(error.message))
-            dispatch(setLoading(false))
+            return {
+                success: false,
+                message: error?.response?.data?.message || error.message
+            }
         }
         finally {
             dispatch(setLoading(false))
@@ -25,6 +29,22 @@ import {register, login , getMe} from '../service/auth.api.js'
         try {
             const response = await login({email , password})
             dispatch(setUser(response.user))
+            return true
+        }
+        catch (error) {
+            dispatch(setError(error.message))
+            return false
+        }
+        finally {
+            dispatch(setLoading(false))
+        }
+    }
+
+    async function fetchMe(){
+        dispatch(setLoading(true))
+        try {
+            const response = await getMe()
+            dispatch(setUser(response.user))
         }
         catch (error) {
             dispatch(setError(error.message))
@@ -34,20 +54,22 @@ import {register, login , getMe} from '../service/auth.api.js'
         }
     }
 
-        async function fetchMe(){
-            dispatch(setLoading(true))
-            try {
-                const response = await getMe()
-                dispatch(setUser(response.user))
+    async function handleResendVerification(email) {
+        try {
+            const response = await resendVerification(email)
+            return {
+                success: true,
+                data: response
             }
-            catch (error) {
-                dispatch(setError(error.message))
-            }
-            finally {
-                dispatch(setLoading(false))
+        } catch (error) {
+            const message = error?.response?.data?.message || error.message
+            return {
+                success: false,
+                message: message
             }
         }
+    }
 
-        return {handleRegister , handleLogin , fetchMe}
+    return {handleRegister , handleLogin , fetchMe, handleResendVerification}
     
 }

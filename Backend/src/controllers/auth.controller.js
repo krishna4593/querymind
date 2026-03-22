@@ -170,7 +170,7 @@ export async function verifyEmail(req, res){
         }
   if(user.verified){
             const htmlContent= `<p>Hi ${user.username},</p><p>Your email is already verified. You can log in to your account and start using QueryMind!<br>
-            <a href="http://localhost:3000/api/auth/login">Login</a> to access your account.</p><p>Best regards,<br>The QueryMind Team</p>`
+            <a href="http://localhost:5173/login">Login</a> to access your account.</p><p>Best regards,<br>The QueryMind Team</p>`
             return res.status(200).send(htmlContent)
         }
         
@@ -179,7 +179,7 @@ export async function verifyEmail(req, res){
         await user.save()
         
         const htmlContent= `<p>Hi ${user.username},</p><p>Your email has been successfully verified. You can now log in to your account and start using QueryMind!
-        <br><a href="http://localhost:3000/api/auth/login">Login</a> to access your account.</p>
+        <br><a href="http://localhost:5173/login">Login</a> to access your account.</p>
         </p><p>Best regards,<br>The QueryMind Team</p> `
 
         return res.status(200).send(htmlContent)

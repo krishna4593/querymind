@@ -1,12 +1,18 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hook/useAuth'
 
 const Register = () => {
+  const navigate = useNavigate()
+  const { handleRegister } = useAuth()
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: ''
   })
+  const [statusMessage, setStatusMessage] = useState('')
+  const [statusType, setStatusType] = useState('idle')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -16,9 +22,28 @@ const Register = () => {
     }))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    console.log('Register payload:', formData)
+    setIsLoading(true)
+    setStatusMessage('')
+
+    const result = await handleRegister(formData)
+
+    if (!result?.success) {
+      setStatusType('error')
+      setStatusMessage(result?.message || 'Registration failed')
+      setIsLoading(false)
+      return
+    }
+
+    const mailSent = result?.data?.mailSent
+    navigate('/verify-pending', {
+      state: {
+        email: formData.email,
+        username: formData.username,
+        mailSent: mailSent ?? true
+      }
+    })
   }
 
   return (
@@ -29,6 +54,19 @@ const Register = () => {
           <p className="mt-2 text-sm text-zinc-400">Make your new account.</p>
 
           <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+            {statusMessage && (
+              <p
+                className={`rounded-lg px-3 py-2 text-sm ${
+                  statusType === 'error'
+                    ? 'bg-red-500/10 text-red-300'
+                    : statusType === 'warning'
+                    ? 'bg-yellow-500/10 text-yellow-300'
+                    : 'bg-emerald-500/10 text-emerald-300'
+                }`}
+              >
+                {statusMessage}
+              </p>
+            )}
             <div>
               <label htmlFor="username" className="mb-2 block text-sm text-zinc-200">
                 Username
@@ -79,9 +117,10 @@ const Register = () => {
 
             <button
               type="submit"
-              className="w-full rounded-lg bg-[#31b8c6] px-4 py-3 text-sm font-semibold text-black transition hover:brightness-110"
+              disabled={isLoading}
+              className="w-full rounded-lg bg-[#31b8c6] px-4 py-3 text-sm font-semibold text-black transition hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Register
+              {isLoading ? 'Registering...' : 'Register'}
             </button>
           </form>
 

@@ -34,3 +34,13 @@ export const getMe = async () => {
         throw error
     }
 }
+
+export const resendVerification = async (email) => {
+    try {
+        const response = await api.post('/api/auth/resend-email', { email })
+        return response.data
+    } catch (error) {
+        console.error('Resend email error:', error)
+        throw error
+    }
+}

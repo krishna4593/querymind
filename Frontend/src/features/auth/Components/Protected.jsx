@@ -13,7 +13,7 @@ const Protected = ({ children }) => {
     }
 
   return (
-   children
+   <>{children}</>
   )
 }
 
