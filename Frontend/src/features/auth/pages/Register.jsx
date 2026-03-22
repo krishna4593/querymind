@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hook/useAuth'
+import { useSelector } from 'react-redux'
 
 const Register = () => {
   const navigate = useNavigate()
   const { handleRegister } = useAuth()
+  const user = useSelector((state) => state.auth.user)
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -44,6 +46,10 @@ const Register = () => {
         mailSent: mailSent ?? true
       }
     })
+  }
+
+  if (user) {
+    return <Navigate to="/dashboard" replace />
   }
 
   return (

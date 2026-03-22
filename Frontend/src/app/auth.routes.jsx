@@ -4,8 +4,13 @@ import Register from '../features/auth/pages/Register'
 import VerifyPending from '../features/auth/pages/VerifyPending'
 import Dashboard from '../features/chat/pages/Dashboard'
 import Protected from '../features/auth/Components/Protected'
+import Home from '../features/auth/pages/Home'
 
 const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Home />
+  },
   {
     path: '/login',
     element: <Login />
@@ -19,7 +24,7 @@ const router = createBrowserRouter([
     element: <VerifyPending />
   },
   {
-    path:'/',
+    path: '/dashboard',
     element: <Protected><Dashboard /></Protected>
   }
 ])

@@ -19,7 +19,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#050608] text-zinc-100">
+    <div className="qm-chat-font h-screen w-screen overflow-hidden bg-[#050608] text-zinc-100">
       <div className="relative flex h-full w-full gap-3 bg-[#090b0f] p-2 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_80px_rgba(0,0,0,0.45)] sm:gap-4 sm:p-3 md:gap-5 md:p-5">
         {!chat.sidebarOpen && (
           <button
@@ -256,23 +256,26 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <form onSubmit={chat.handleSend} className="rounded-2xl border border-zinc-800 bg-[#06080c] p-2.5 sm:p-3">
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <input
-                type="text"
-                value={chat.messageInput}
-                onChange={(event) => chat.setMessageInput(event.target.value)}
-                placeholder="Enter the message..."
-                className="flex-1 rounded-xl border border-zinc-700 bg-zinc-900/80 px-4 py-3 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-500 focus:border-cyan-500/60 md:text-base"
-              />
-              <button
-                type="submit"
-                disabled={chat.sending}
-                className="w-full rounded-xl border border-cyan-500/50 bg-cyan-500/20 px-5 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-500/30 sm:w-auto"
-              >
-                {chat.sending ? "Sending..." : "Send"}
-              </button>
-            </div>
+          <form onSubmit={chat.handleSend} className="relative">
+            <input
+              type="text"
+              value={chat.messageInput}
+              onChange={(event) => chat.setMessageInput(event.target.value)}
+              placeholder="Ask the question..."
+              className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 px-4 py-3 pr-12 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-500 focus:border-cyan-500/60 md:text-base"
+            />
+            <button
+              type="submit"
+              disabled={chat.sending}
+              className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-content-center rounded-lg bg-cyan-500/25 text-cyan-100 transition hover:bg-cyan-500/35 disabled:cursor-not-allowed disabled:opacity-60"
+              aria-label={chat.sending ? "Sending" : "Send message"}
+              title={chat.sending ? "Sending" : "Send message"}
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14" />
+                <path d="M13 5l7 7-7 7" />
+              </svg>
+            </button>
           </form>
         </section>
       </div>

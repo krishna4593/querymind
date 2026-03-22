@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hook/useAuth'
+import { useSelector } from 'react-redux'
 
 const Login = () => {
   const navigate = useNavigate()  
   const {handleLogin} = useAuth()
+  const user = useSelector((state) => state.auth.user)
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -18,10 +20,16 @@ const Login = () => {
     }))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    handleLogin(formData)
-    navigate('/')
+    const isLoggedIn = await handleLogin(formData)
+    if (isLoggedIn) {
+      navigate('/dashboard')
+    }
+  }
+
+  if (user) {
+    return <Navigate to="/dashboard" replace />
   }
 
   return (
