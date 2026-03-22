@@ -1,0 +1,36 @@
+# Dependencies
+**/node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Build outputs
+Frontend/dist/
+Frontend/.vite/
+Backend/dist/
+Backend/build/
+
+# Runtime files
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test and coverage
+coverage/
+**/coverage/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Optional local cache files
+**/.cache/
+**/.eslintcache
