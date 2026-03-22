@@ -206,7 +206,11 @@ const Dashboard = () => {
                   key={msg.id}
                   className={`max-w-[92%] break-words text-sm leading-relaxed sm:max-w-[85%] md:text-base ${
                     msg.role === "user"
-                      ? "ml-auto w-fit rounded-2xl bg-cyan-500/10 px-3 py-3 text-cyan-100 sm:px-4"
+                      ? `ml-auto w-fit rounded-2xl px-3 py-3 sm:px-4 ${
+                          msg.optimistic
+                            ? "bg-cyan-500/5 text-cyan-200/80"
+                            : "bg-cyan-500/10 text-cyan-100"
+                        }`
                       : "w-full text-zinc-200"
                   }`}
                 >
@@ -214,6 +218,9 @@ const Dashboard = () => {
                     {msg.role === "user" ? "User message" : "AI response"}
                   </p>
                   {msg.role === "ai" ? (
+                    msg.optimistic ? (
+                      <p className="italic text-zinc-400">AI is thinking...</p>
+                    ) : (
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
@@ -240,6 +247,7 @@ const Dashboard = () => {
                     >
                       {msg.content || ""}
                     </ReactMarkdown>
+                    )
                   ) : (
                     <p>{msg.content}</p>
                   )}

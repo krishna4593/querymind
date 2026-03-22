@@ -65,6 +65,7 @@ const initialState = {
   sending: false,
   loadingChats: false,
   loadingMessages: false,
+  optimisticMessageIds: [],
   error: null,
 };
 
@@ -135,12 +136,41 @@ const chatSlice = createSlice({
         state.loadingMessages = false;
         state.error = action.payload || "Failed to load messages";
       })
-      .addCase(sendMessage.pending, (state) => {
+      .addCase(sendMessage.pending, (state, action) => {
         state.sending = true;
         state.error = null;
+
+        const pendingMessage = (action?.meta?.arg?.message || "").trim();
+        if (pendingMessage) {
+          const tempUserId = `temp-user-${Date.now()}`;
+          const tempAiId = `temp-ai-${Date.now()}`;
+
+          state.messages.push({
+            id: tempUserId,
+            role: "user",
+            content: pendingMessage,
+            optimistic: true,
+          });
+
+          state.messages.push({
+            id: tempAiId,
+            role: "ai",
+            content: "AI is thinking...",
+            optimistic: true,
+          });
+
+          state.optimisticMessageIds = [tempUserId, tempAiId];
+        }
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.sending = false;
+
+        if (state.optimisticMessageIds.length) {
+          state.messages = state.messages.filter(
+            (msg) => !state.optimisticMessageIds.includes(msg.id)
+          );
+          state.optimisticMessageIds = [];
+        }
 
         const { chat, userMessage, aiMessage, sourceChatId } = action.payload;
 
@@ -172,6 +202,12 @@ const chatSlice = createSlice({
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.sending = false;
+        if (state.optimisticMessageIds.length) {
+          state.messages = state.messages.filter(
+            (msg) => !state.optimisticMessageIds.includes(msg.id)
+          );
+          state.optimisticMessageIds = [];
+        }
         state.error = action.payload || "Failed to send message";
       })
       .addCase(deleteChat.fulfilled, (state, action) => {
