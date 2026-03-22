@@ -70,6 +70,19 @@ import {register, login , getMe, resendVerification} from '../service/auth.api.j
         }
     }
 
-    return {handleRegister , handleLogin , fetchMe, handleResendVerification}
+    async function handleLogout() {
+        dispatch(setLoading(true))
+        try {
+            dispatch(setUser(null))
+            return true
+        } catch (error) {
+            dispatch(setError(error.message))
+            return false
+        } finally {
+            dispatch(setLoading(false))
+        }
+    }
+
+    return {handleRegister , handleLogin , fetchMe, handleResendVerification, handleLogout}
     
 }
