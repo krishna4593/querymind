@@ -5,14 +5,15 @@
 	--qm-card: #0d1015;
 	--qm-text: #e5e7eb;
 	--qm-accent: #31b8c6;
-	--qm-chat-font: 'IBM Plex Sans', sans-serif;
+	--qm-font: 'Manrope', sans-serif;
+	--qm-chat-font: 'Source Sans 3', sans-serif;
 }
 
 body {
 	margin: 0;
 	background: var(--qm-bg);
 	color: var(--qm-text);
-	font-family: 'Space Grotesk', sans-serif;
+	font-family: var(--qm-font);
 }
 
 #root {

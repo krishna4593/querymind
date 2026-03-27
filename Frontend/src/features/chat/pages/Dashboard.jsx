@@ -45,7 +45,7 @@ const Dashboard = () => {
 
         {chat.sidebarOpen && (
           <aside className="absolute inset-y-2 left-2 z-30 flex w-[85vw] max-w-xs flex-col rounded-2xl border border-zinc-800/90 bg-[#0c0f14] transition-all duration-300 sm:w-72 md:static md:inset-auto md:z-auto md:h-full md:shrink-0">
-          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-4">
+          <div className="flex items-center justify-between border-b border-zinc-800 px-3 py-3">
             <div
               className="flex w-full items-center justify-center gap-2"
             >
@@ -73,7 +73,7 @@ const Dashboard = () => {
             </button>
           </div>
 
-          <div className="flex-1 space-y-4 overflow-hidden p-4">
+          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden p-3">
             <div className="space-y-2">
               <button
                 type="button"
@@ -102,11 +102,11 @@ const Dashboard = () => {
               )}
             </div>
 
-            <div className="h-[calc(100%-88px)] rounded-2xl border border-zinc-800 bg-black/20 p-3">
-              <p className="mb-3 text-sm font-medium text-zinc-300">
+            <div className="flex min-h-0 flex-1 flex-col rounded-2xl border border-zinc-800 bg-black/20 p-2.5">
+              <p className="mb-2 text-sm font-medium text-zinc-300">
                 Your Chats {chat.loadingChats ? "..." : ""}
               </p>
-              <div className="h-full space-y-2 overflow-y-auto pb-4 pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pb-4 pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {chat.filteredChats.map((chatItem) => (
                   <div
                     key={chatItem.id}
@@ -157,14 +157,14 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="border-t border-zinc-800 px-4 py-3">
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-3">
+          <div className="border-t border-zinc-800 px-3 py-2">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-2.5">
               <p className="truncate text-sm font-medium text-zinc-200">{user?.user?.username || "User"}</p>
               <p className="truncate text-xs text-zinc-400">{user?.user?.email || "No email"}</p>
               <button
                 type="button"
                 onClick={onLogout}
-                className="mt-3 w-full rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-200 transition hover:bg-red-500/20"
+                className="mt-2 w-full rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-200 transition hover:bg-red-500/20"
               >
                 Logout
               </button>
@@ -174,11 +174,11 @@ const Dashboard = () => {
         )}
 
         <section
-          className={`flex min-w-0 flex-1 flex-col rounded-2xl bg-[#0a0d12] p-3 md:p-4 ${
+          className={`flex min-w-0 flex-1 flex-col rounded-2xl bg-[#0a0d12] p-3 md:p-2 ${
             chat.sidebarOpen ? "" : "pt-12 md:pt-0 md:ml-10 md:mt-8"
           }`}
         >
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-zinc-950/40 px-3 py-3 sm:px-4">
+          <div className="mb-1 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-zinc-950/40 px-3 py-1 sm:px-4">
             <h2 className="truncate text-sm font-medium text-zinc-300 md:text-base">
               {chat.activeChat?.title || "New Chat"}
             </h2>
@@ -204,9 +204,9 @@ const Dashboard = () => {
               {chat.messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`max-w-[92%] break-words text-sm leading-relaxed sm:max-w-[85%] md:text-base ${
+                  className={`break-words text-sm leading-relaxed md:text-base ${
                     msg.role === "user"
-                      ? `ml-auto w-fit rounded-2xl px-3 py-3 sm:px-4 ${
+                      ? `ml-auto w-fit max-w-[92%] rounded-2xl px-3 py-3 sm:max-w-[82%] sm:px-4 lg:max-w-[72%] ${
                           msg.optimistic
                             ? "bg-cyan-500/5 text-cyan-200/80"
                             : "bg-cyan-500/10 text-cyan-100"
