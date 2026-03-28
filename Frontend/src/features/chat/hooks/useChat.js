@@ -1,19 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { initializeSocket } from "../service/chat.socket";
+import { socket } from "../service/chat.socket";
+
 import {
   fetchChats,
   fetchMessages,
-  sendMessage,
   deleteChat,
   setSidebarOpen,
   setShowSearch,
   setSearchQuery,
   setActiveChat,
   resetCurrentChat,
+  addMessage,
+  updateLastMessage,
+  setError,
 } from "../state/chat.slice";
 
 const useChat = () => {
+  const user = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const {
     sidebarOpen,
@@ -34,8 +38,51 @@ const useChat = () => {
   const [messageInput, setMessageInput] = useState("");
 
   useEffect(() => {
-    initializeSocket();
+    socket.connect();
     dispatch(fetchChats());
+  }, [dispatch]);
+
+ useEffect(() => {
+
+      socket.on("connect", () => {
+        dispatch(setError(null));
+      });
+
+      socket.on("disconnect", () => {
+        dispatch(setError("Connection lost. Reconnecting..."));
+      });
+
+      socket.on("connect_error", () => {
+        dispatch(setError("Unable to connect to chat server."));
+      });
+
+    //receive streaming messages
+    socket.on("receive_message", (message) => {
+      dispatch(updateLastMessage(message));
+    });
+
+    // when stream ends
+    socket.on("stream_end", async (data) => {
+      if (data.chatId) {
+        dispatch(setActiveChat(data.chatId));
+        await dispatch(fetchChats());
+        await dispatch(fetchMessages(data.chatId));
+      }
+    });
+
+    // handle errors
+    socket.on("error", (errorMessage) => {
+      dispatch(setError(errorMessage));
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("connect_error");
+      socket.off("receive_message");
+      socket.off("stream_end");
+      socket.off("error");
+    };
   }, [dispatch]);
 
   const handleSearchToggle = useCallback(() => {
@@ -68,29 +115,45 @@ const useChat = () => {
   }, [dispatch]);
 
   const handleSend = useCallback(
-    async (e) => {
-      e.preventDefault();
-      const message = messageInput.trim();
-      if (!message || sending) return;
+  (e) => {
+    e.preventDefault();
 
-      setMessageInput("");
-      try {
-        await dispatch(
-          sendMessage({
-            message,
-            chatId: activeChatId,
-          })
-        ).unwrap();
+    const message = messageInput.trim();
+    if (!message || sending) return;
 
-        if (!activeChatId) {
-          await dispatch(fetchChats()).unwrap();
-        }
-      } catch {
-        // Errors are already managed by the chat slice.
-      }
-    },
-    [dispatch, messageInput, activeChatId, sending]
-  );
+    // 🔴 check user
+    if (!user?.user?.id) {
+      dispatch(setError("Please login again before sending messages."));
+      return;
+    }
+
+    setMessageInput("");
+
+    // 🟢 1. Add USER message instantly
+    dispatch(addMessage({
+      id: Date.now(),
+      role: "user",
+      content: message,
+    }));
+
+    // 🟢 2. Add AI placeholder (for streaming)
+    dispatch(addMessage({
+      id: `ai-temp-${Date.now()}`,
+      role: "ai",
+      content: "",
+      optimistic: true,
+    }));
+
+    // 🔥 3. SEND via socket
+    socket.emit("send_message", {
+      message,
+      chatId: activeChatId,
+      userId: user.user.id,
+    });
+
+  },
+  [messageInput, activeChatId, sending, dispatch, user]
+);
 
   return {
     sidebarOpen,
@@ -116,7 +179,7 @@ const useChat = () => {
     handleDeleteChat,
     handleNewChat,
     handleSend,
-    initializeSocket,
+    
   };
 };
 

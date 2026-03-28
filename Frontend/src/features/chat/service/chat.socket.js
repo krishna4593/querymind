@@ -1,11 +1,12 @@
-import {io} from 'socket.io-client'
+import { io } from "socket.io-client";
 
-export function initializeSocket() {
-    const socket = io('http://localhost:3000', {
+// create ONE socket connection
+export const socket = io("http://localhost:3000", {
   withCredentials: true,
-})
-
-socket.on('connect', () => {
-  console.log('Connected to Socket.IO server')
-})
-}
+  reconnection: true,
+  reconnectionAttempts: 10,
+  reconnectionDelay: 500,
+  reconnectionDelayMax: 3000,
+  timeout: 10000,
+  autoConnect: false,
+});

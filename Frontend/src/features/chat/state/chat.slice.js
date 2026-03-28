@@ -104,6 +104,21 @@ const chatSlice = createSlice({
     clearChatError(state) {
       state.error = null;
     },
+    setError(state, action) {
+      state.error = action.payload;
+    },
+    addMessage(state, action) {
+      state.messages.push(action.payload);
+    },
+    updateLastMessage(state, action) {
+      if (state.messages.length > 0) {
+        const lastMessage = state.messages[state.messages.length - 1];
+        if (lastMessage.role === "ai") {
+          lastMessage.optimistic = false;
+          lastMessage.content += typeof action.payload === "string" ? action.payload : String(action.payload ?? "");
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -234,6 +249,9 @@ export const {
   setActiveChat,
   resetCurrentChat,
   clearChatError,
+  setError,
+  addMessage,
+  updateLastMessage,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

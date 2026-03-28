@@ -98,6 +98,7 @@ export async function registerController(req,res){
         return res.status(201).json({
             message: mailSent ? "user registered successfully" : "user registered successfully, but email could not be sent",
             user:{
+                id:user._id,
                 email:user.email,
                 username:user.username
             },
@@ -155,6 +156,7 @@ export async function loginController(req,res){
             success:true,
             token,
             user:{
+                id:user._id,
                 email:user.email,
                 username:user.username
             }
@@ -185,6 +187,7 @@ export async function getMe(req,res){
             message:"user fetched successfully",
             success:true,
             user:{
+                id:user._id,
                 email:user.email,
                 username:user.username,
                 verified:user.verified
