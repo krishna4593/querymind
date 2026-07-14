@@ -1,6 +1,8 @@
 import userModel from "../modules/user.model.js"
 import { sendEmail } from "../services/mail.service.js"
 import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+dotenv.config()
 
 //register controller
 export async function registerController(req,res){
@@ -69,7 +71,7 @@ export async function registerController(req,res){
                 <p>Thank you for joining QueryMind! We're thrilled to have you on board.</p>
                 <p>To complete your registration and start using QueryMind, please verify your email address by clicking the button below:</p>
                 <div class="button-container">
-                    <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}" class="button">Verify Email Address</a>
+                    <a href="${process.env.BACKEND_URL}/api/auth/verify-email?token=${emailVerificationToken}" class="button">Verify Email Address</a>
                 </div>
                 <div class="info-box">
                     <p><strong>Why verify?</strong> Email verification helps us keep your account secure and ensures you receive important notifications.</p>
@@ -78,7 +80,7 @@ export async function registerController(req,res){
             </div>
             <div class="footer">
                 <p>&copy; 2024 QueryMind. All rights reserved.</p>
-                <p>If the button doesn't work, copy and paste this link in your browser:<br><span style="color: #31b8c6; word-break: break-all;">http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}</span></p>
+                <p>If the button doesn't work, copy and paste this link in your browser:<br><span style="color: #31b8c6; word-break: break-all;">${process.env.BACKEND_URL}/api/auth/verify-email?token=${emailVerificationToken}</span></p>
             </div>
         </div>
     </div>
@@ -437,7 +439,7 @@ if (user.lastEmailSentAt && now - user.lastEmailSentAt < 60000) {
                 <p>We received a request to resend your email verification link.</p>
                 <p>Please click the button below to verify your email address and activate your account:</p>
                 <div class="button-container">
-                    <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}" class="button">Verify Email Address</a>
+                    <a href="${process.env.BACKEND_URL}/api/auth/verify-email?token=${emailVerificationToken}" class="button">Verify Email Address</a>
                 </div>
                 <div class="info-box">
                     <p><strong>Didn't request this?</strong> If you didn't ask for this email, you can safely ignore it. Your previous verification link will also still be valid.</p>
@@ -446,7 +448,7 @@ if (user.lastEmailSentAt && now - user.lastEmailSentAt < 60000) {
             </div>
             <div class="footer">
                 <p>&copy; 2024 QueryMind. All rights reserved.</p>
-                <p>If the button doesn't work, copy and paste this link in your browser:<br><span style="color: #31b8c6; word-break: break-all;">http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}</span></p>
+                <p>If the button doesn't work, copy and paste this link in your browser:<br><span style="color: #31b8c6; word-break: break-all;">${process.env.BACKEND_URL}/api/auth/verify-email?token=${emailVerificationToken}</span></p>
             </div>
         </div>
     </div>

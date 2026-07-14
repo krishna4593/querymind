@@ -284,7 +284,7 @@ npm run dev
 npm start
 ```
 
-**Backend runs on:** `http://localhost:3000`
+**Backend runs on:** `https://querymind-1-b8al.onrender.com`
 
 ### Frontend
 
