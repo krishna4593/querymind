@@ -2,6 +2,8 @@ import { Router } from "express";
 import { registerController, verifyEmail, loginController, getMe, resendVerificationEmail } from "../controllers/auth.controller.js";
 import { registerValidator, loginValidator } from "../validators/auth.validator.js";
 import {authUser} from "../middlewares/auth.middleware.js"
+import dotenv from "dotenv";
+dotenv.config();
 
 const router = Router();
 //Register Route .. "/api/auth/register"
@@ -12,7 +14,7 @@ router.get("/verify-email", verifyEmail);
 
 //login route "/api/auth/login" - GET redirect to frontend
 router.get("/login", (req, res) => {
-  res.redirect("http://localhost:5173/login");
+  res.redirect(`${process.env.FRONTEND_URL}/login`);
 });
 
 //login route "/api/auth/login" - POST for API

@@ -1,8 +1,7 @@
 import userModel from "../modules/user.model.js"
 import { sendEmail } from "../services/mail.service.js"
 import jwt from "jsonwebtoken"
-import dotenv from "dotenv"
-dotenv.config()
+
 
 //register controller
 export async function registerController(req,res){
@@ -151,7 +150,12 @@ export async function loginController(req,res){
         process.env.JWT_SECRET,
         {expiresIn:"7d"}
         )
-        res.cookie("token", token)
+        res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+})                   
 
         return res.status(200).json({
             message:"user logged in successfully",
@@ -269,7 +273,7 @@ export async function verifyEmail(req, res){
                 <p>Your email <span class="highlight">${user.email}</span> has been verified successfully.</p>
                 <p>You can now log in to your account and start chatting with our AI assistant.</p>
                 <div class="button-container">
-                    <a href="http://localhost:5173/login" class="button">Go to Login</a>
+                    <a href="${process.env.FRONTEND_URL}/login" class="button">Go to Login</a>
                 </div>
                 <div class="info-list">
                     <ul>
@@ -328,7 +332,7 @@ export async function verifyEmail(req, res){
                 <h2>Welcome back, <span style="color: #31b8c6;">${user.username}</span>!</h2>
                 <p>Your email has already been verified. You can proceed to log in to your QueryMind account.</p>
                 <div class="button-container">
-                    <a href="http://localhost:5173/login" class="button">Go to Login</a>
+                    <a href="${process.env.FRONTEND_URL}/login" class="button">Go to Login</a>
                 </div>
             </div>
             <div class="footer">
