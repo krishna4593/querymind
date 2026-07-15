@@ -1,15 +1,38 @@
 import nodemailer from "nodemailer";
+import dns from "node:dns";
+
+// Force Node.js to prefer IPv4 over IPv6
+dns.setDefaultResultOrder("ipv4first");
+
+// Debug (remove after testing)
+console.log("GOOGLE_USER:", process.env.GOOGLE_USER);
+console.log(
+  "APP_PASSWORD EXISTS:",
+  !!process.env.GOOGLE_APP_PASSWORD
+);
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // SSL
+  port: 587,
+  secure: false, // STARTTLS
+  requireTLS: true,
+
   auth: {
     user: process.env.GOOGLE_USER,
     pass: process.env.GOOGLE_APP_PASSWORD,
   },
+
+  family: 4, // Force IPv4
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
+
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
+// Verify transporter
 transporter.verify((error, success) => {
   if (error) {
     console.error("❌ Email server connection failed:", error);
