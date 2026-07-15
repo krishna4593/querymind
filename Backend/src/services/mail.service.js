@@ -1,33 +1,39 @@
 import nodemailer from "nodemailer";
 import { google } from "googleapis";
+import dns from "dns";
 
-const oAuth2Client = new google.auth.OAuth2(
+// Force Node to prefer IPv4 over IPv6
+dns.setDefaultResultOrder("ipv4first");
+
+const OAuth2 = google.auth.OAuth2;
+
+const oauth2Client = new OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET
 );
 
-oAuth2Client.setCredentials({
+oauth2Client.setCredentials({
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
 });
 
 async function createTransporter() {
   try {
-    const accessTokenResponse = await oAuth2Client.getAccessToken();
-
-    const accessToken =
-      typeof accessTokenResponse === "string"
-        ? accessTokenResponse
-        : accessTokenResponse?.token;
+    const accessToken = await oauth2Client.getAccessToken();
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // STARTTLS
       auth: {
         type: "OAuth2",
         user: process.env.GOOGLE_USER,
         clientId: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
-        accessToken,
+        accessToken: accessToken.token,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     });
 
@@ -51,7 +57,7 @@ export async function sendEmail({
     const transporter = await createTransporter();
 
     const info = await transporter.sendMail({
-      from: process.env.GOOGLE_USER,
+      from: `"QueryMind" <${process.env.GOOGLE_USER}>`,
       to,
       subject,
       text,
